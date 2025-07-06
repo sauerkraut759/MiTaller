@@ -1,0 +1,53 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark py-2 py-sm-3">       
+    <div class="container">
+        <a href="/" class="navbar-brand d-flex">
+            <span class="align-self-center h3 ms-2">MiTaller</span>
+        </a>
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#contenidoMenu"
+                aria-controls="contenidoMenu"
+                aria-expanded="false"
+                aria-label="Mostrar/Ocultar Navegacion"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse flex-lg-grow-0" id="contenidoMenu">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a 
+                        href="#"
+                        class="nav-link dropdown-toggle"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        id="dropdown-usuario"
+                    >
+                        {% if user.first_name %}
+                            {{user.first_name}}
+                        {% else %}
+                            {{user.username}}
+                        {% endif %}
+                    </a>
+
+                    <ul class="dropdown-menu text-light" aria-labelledby="dropdown-usuario">
+                        <li><a href="/logout" class="dropdown-item">Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="/retiro" class="nav-link">Proponer Taller</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a href="/login" class="nav-link">Acceso Junta de Vecinos</a>
+                </li>
+                {% endif %}    
+            </ul>
+                
+        </div>
+    </div>   
+</nav>
