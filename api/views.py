@@ -6,6 +6,7 @@ from django.utils import timezone
 from core.models import Categoria, Lugar, Profesor, Taller
 
 from .serializers import CategoriaSerializer, ProfesorSerializer, LugarSerializer, TallerSerializer
+from common.utils import comprobarFeriado
 
 # Create your views here.
 
@@ -78,30 +79,10 @@ def viewTalleres(request):
         data = serializer.validated_data
         fecha_taller = data['fecha']
         categoria = data['categoria']
-        estado = 'pendiente'
-        observacion = ''
-            
-        try:
-            res = requests.get('https://api.boostr.cl/holidays.json')
-            res.raise_for_status()
-            feriados = res.json()['data']
-        except requests.exceptions.RequestException as e:
-            return Response({'error': 'Error al consultar api de feriados'}, status=502)
 
-        for feriado in feriados:
-            fecha = datetime.fromisoformat(feriado['date']).date()
+        data_comprobada = comprobarFeriado(fecha_taller, categoria)
 
-            if fecha_taller.date() == fecha:
-                if feriado['inalienable']:
-                    estado = 'rechazado'
-                    observacion = 'No se programan talleres en feriados irrenunciables'
-                elif categoria.id != 1:
-                    estado='rechazado'
-                    observacion = 'Solo se programan talleres al aire libre en feriados'
-
-                break
-
-        taller = serializer.save(estado=estado, observacion=observacion)
+        taller = serializer.save(estado=data_comprobada['estado'], observacion=data_comprobada['observacion'])
 
         return Response(TallerSerializer(taller).data, status=201)
     
