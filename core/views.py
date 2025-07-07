@@ -1,32 +1,23 @@
 import requests
+import json
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from dateutil.parser import parse
+from django.utils import timezone
+from django.core.serializers import serialize
 
-from .models import Categoria, Profesor, Lugar
+from .models import Categoria, Profesor, Lugar, Taller
+from .forms import ProponerTallerForm
 
 # Create your views here.}
 
 API_URL = 'http://localhost:8000/api/'
 
 def home(request):
-    try:
-        # No estaba seguro si consumir la propia API del sistema era un requerimiento asi que lo hice de todas formas para asegurar
-        # Normalmente obtendria la informacion a traves de los modelos
-        response = requests.get(API_URL + 'talleres?futuros=true')
-        response.raise_for_status()
-        talleres = response.json()
-    except requests.exceptions.RequestException as e:
-        talleres = []
-        print("Error al consultar la API:", e)
 
-    for taller in talleres:
-        taller["fecha"] = parse(taller["fecha"])
-        taller["profesor"] = Profesor.objects.get(id=taller["profesor"])
-        taller["categoria"] = Categoria.objects.get(id=taller["categoria"])
-        taller["lugar"] = Lugar.objects.get(id=taller["lugar"])
+    talleres = Taller.objects.filter(estado='aceptado', fecha__gte=timezone.now().date())
 
     data = {
         "talleres": talleres
@@ -87,3 +78,36 @@ def verTalleres(request):
     }
     
     return render(request, 'core/talleres.html', data)
+
+def proponerTaller(request):
+    if request.user.is_anonymous:
+        return redirect('home')
+    
+
+    if request.method == 'POST':
+        sessionid = request.COOKIES.get('sessionid')
+        csrftoken = request.COOKIES.get('csrftoken')
+        cookies = {'sessionid': sessionid, 'csrftoken': csrftoken}
+        headers = {'X-CSRFToken': csrftoken} if csrftoken else {}
+        headers['Content-Type'] = 'application/json'
+
+        form = ProponerTallerForm(request.POST)
+
+        if form.is_valid():
+            taller = form.save(commit=False)
+            taller_json = serialize('json', [taller])
+            data = json.loads(taller_json)
+            fields = data[0]['fields'] # serialize funciona con listas
+
+            try:
+                response = requests.post(API_URL + 'talleres/', json=fields,headers=headers, cookies=cookies)
+                response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                print("Error al enviar datos a la API", e)
+        
+        return redirect('proponerTaller')
+            
+    else:
+        form = ProponerTallerForm
+
+    return render(request, 'core/proponer.html', {'form': form})
