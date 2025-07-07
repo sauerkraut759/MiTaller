@@ -1,5 +1,7 @@
 from django.contrib import admin
+
 from .models import Profesor, Categoria, Lugar, Taller
+from common.utils import comprobarFeriado
 
 # Register your models here.
 
@@ -44,6 +46,17 @@ class TallerAdmin(admin.ModelAdmin):
             taller.save()
 
         self.message_user(request, f"{queryset.count()} nuevos talleres marcados para revision.")
+
+    def save_model(self, request, obj, form, change):
+
+        if not change:
+            data_comprobada = comprobarFeriado(obj.fecha, obj.categoria)
+
+            obj.estado = data_comprobada['estado']
+            obj.observacion = data_comprobada['observacion']
+
+
+        return super().save_model(request, obj, form, change)
         
 
 
