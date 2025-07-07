@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+
+<main class="row contenedor-main">
+    <h2>Proponer un taller</h2>
+    <div class="alert alert-warning">Los talleres propuestos para dias feriados irrenunciables serán automáticamente rechazados, para otros feriados sólo se admitirán si son al aire libre</div>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+</main>
+
+{% endblock %}
