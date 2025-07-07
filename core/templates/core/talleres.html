@@ -6,6 +6,40 @@
     <h3>Historial de Talleres</h3>
     <p class="lead">A continuacion podrá ver todos los talleres aceptados, en revisión y rechazados por la Municipalidad de Villa Verde</p>
     <hr>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Titulo</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Profesor</th>
+                <th scope="col">Lugar</th>
+                <th scope="col">Categoria</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Observación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for taller in talleres %}
+            <tr>
+                <td>{{taller.titulo}}</td>
+                <td>{{taller.fecha|date:'d-m-y'}}</td>
+                <td>
+                    {% if taller.profesor %}
+                        {{taller.profesor.nombre}} {{taller.profesor.apellido}}
+                    {% else %}
+                        Sin asignar
+                    {% endif %}
+                </td>
+                <td>{{taller.lugar.nombre}}</td>
+                <td>{{taller.categoria.nombre}}</td>
+                <td>{{taller.estado}}</td>
+                <td>{{taller.observacion}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
 </main>
 
 {% endblock %}

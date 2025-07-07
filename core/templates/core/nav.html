@@ -17,33 +17,17 @@
         <div class="collapse navbar-collapse flex-lg-grow-0" id="contenidoMenu">
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                <li class="nav-item dropdown">
-                    <a 
-                        href="#"
-                        class="nav-link dropdown-toggle"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                        id="dropdown-usuario"
-                    >
-                        {% if user.first_name %}
-                            {{user.first_name}}
-                        {% else %}
-                            {{user.username}}
-                        {% endif %}
-                    </a>
-
-                    <ul class="dropdown-menu text-light" aria-labelledby="dropdown-usuario">
-                        <li><a href="/logout" class="dropdown-item">Cerrar Sesión</a></li>
-                    </ul>
+                
+                <li class="nav-item me-4">
+                    <a href="/logout" class="nav-link">Cerrar Sesion</a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="/talleres/todos" class="nav-link">Historial de Talleres</a>
+                    <a href="/talleres/todos" class="btn btn-secondary me-2">Historial de Talleres</a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="/talleres/proponer" class="nav-link">Proponer un Taller</a>
+                    <a href="/talleres/proponer" class="btn btn-primary">Proponer un Taller</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
