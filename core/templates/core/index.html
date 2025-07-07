@@ -5,7 +5,34 @@
 
 <main class="row contenedor-main">
     <h2>Bienvenido a MiTaller</h2>
-    <h5>Aqui podras encontrar todos los talleres proximos a desarrollar en la comuna de Villa Verde</h5>
+    <h5>Aqui podras encontrar todos los talleres proximos a desarrollar por la Municipalidad de Villa Verde</h5>
+    <hr>
+    <h3>Próximos talleres:</h3>
+    <hr>
+    <ul class="list-group list-group-flush">
+        {% for taller in talleres %}
+        <li class="list-group-item">
+            <p class="lead">{{taller.titulo}}</p>
+            <p>📆 Fecha: {{taller.fecha|date:'d-m-y'}}</p>
+            <p>⏱️ Duración: {{taller.duracion_horas}} horas</p>
+            <p>👤 Profesor: {{taller.profesor.nombre}} {{taller.profesor.apellido}}</p>
+            <p>
+                📍 Lugar: {{taller.lugar.nombre}} 
+                <a  href="#collapse{{taller.id}}"
+                    data-bs-toggle="collapse"
+                    role="button"
+                    aria-expanded="false"
+                    aria-controls="collapse{{taller.id}}">
+                    ver dirección
+                </a>
+            </p>
+            <div class="collapse" id="collapse{{taller.id}}">
+                <p class="ms-5">🗺️ {{taller.lugar.direccion}}</p>
+            </div>
+            <p>📆 Categoría: {{taller.categoria.nombre}}</p>
+        </li>
+        {% endfor %}
+    </ul>
 </main>
 
 {% endblock %}
