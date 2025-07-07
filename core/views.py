@@ -12,7 +12,6 @@ from .models import Categoria, Profesor, Lugar
 API_URL = 'http://localhost:8000/api/'
 
 def home(request):
-
     try:
         # No estaba seguro si consumir la propia API del sistema era un requerimiento asi que lo hice de todas formas para asegurar
         # Normalmente obtendria la informacion a traves de los modelos
@@ -67,4 +66,24 @@ def verTalleres(request):
     if request.user.is_anonymous:
         return redirect('home')
     
-    return render(request, 'core/talleres.html')
+    cookies = {'sessionid': request.COOKIES.get('sessionid')}
+    
+    try:
+        response = requests.get(API_URL + 'talleres', cookies=cookies)
+        response.raise_for_status()
+        talleres = response.json()
+    except requests.exceptions.RequestException as e:
+        talleres = []
+        print("Error al consultar la API")
+
+    for taller in talleres:
+        taller["fecha"] = parse(taller["fecha"])
+        taller["profesor"] = Profesor.objects.get(id=taller["profesor"]) if taller["profesor"] else None
+        taller["categoria"] = Categoria.objects.get(id=taller["categoria"])
+        taller["lugar"] = Lugar.objects.get(id=taller["lugar"])
+
+    data = {
+        "talleres": talleres
+    }
+    
+    return render(request, 'core/talleres.html', data)
